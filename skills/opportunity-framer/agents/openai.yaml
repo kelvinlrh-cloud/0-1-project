@@ -1,0 +1,4 @@
+interface:
+  display_name: "Opportunity Framer"
+  short_description: "Frame a product idea into a testable opportunity."
+  default_prompt: "Use $opportunity-framer to turn this idea into a clear product opportunity definition."

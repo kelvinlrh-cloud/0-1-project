@@ -1,0 +1,4 @@
+interface:
+  display_name: "User Research Planner"
+  short_description: "Design interview and research plans for opportunity validation."
+  default_prompt: "Use $user-research-planner to design the user research plan for validating this opportunity."

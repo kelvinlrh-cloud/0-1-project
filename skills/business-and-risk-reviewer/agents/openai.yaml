@@ -1,0 +1,4 @@
+interface:
+  display_name: "Business and Risk Reviewer"
+  short_description: "Review retention, growth, economics, and key risks."
+  default_prompt: "Use $business-and-risk-reviewer to judge business viability and kill criteria for this opportunity."

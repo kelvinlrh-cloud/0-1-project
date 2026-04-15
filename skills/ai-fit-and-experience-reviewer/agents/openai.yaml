@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Fit and Experience Reviewer"
+  short_description: "Judge whether AI truly fits the product experience."
+  default_prompt: "Use $ai-fit-and-experience-reviewer to evaluate whether AI is necessary in this product experience."

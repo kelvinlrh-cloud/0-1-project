@@ -1,0 +1,4 @@
+interface:
+  display_name: "MVP Scope Planner"
+  short_description: "Converge prior judgments into a narrow MVP scope."
+  default_prompt: "Use $mvp-scope-planner to turn the approved initiation findings into an MVP feature list."

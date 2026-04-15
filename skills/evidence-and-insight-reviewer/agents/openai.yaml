@@ -1,0 +1,4 @@
+interface:
+  display_name: "Evidence and Insight Reviewer"
+  short_description: "Assess whether evidence supports the opportunity."
+  default_prompt: "Use $evidence-and-insight-reviewer to review whether current evidence is strong enough to proceed."
