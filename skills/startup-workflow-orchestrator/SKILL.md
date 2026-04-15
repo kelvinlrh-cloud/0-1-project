@@ -112,6 +112,13 @@ Never auto-run the next stage.
 - Keep machine-stable identifiers such as stage ids, YAML keys, file names, and status enums unchanged when needed for workflow compatibility.
 - Only switch workflow artifacts to another language if the user explicitly asks.
 
+## Deliverable Preference Rule
+
+- If the user asks to move beyond workflow analysis into MVP definition, implementation preparation, or execution handoff, prefer outputting a structured PRD with product structure by default.
+- A "structured PRD with product structure" should usually include: product positioning, goals and non-goals, product structure, information architecture, user flows, page or module structure, functional requirements, success metrics, scope boundaries, and acceptance criteria.
+- Do not automatically output prototypes, interactive mockups, or visual demos unless the user explicitly asks for a prototype.
+- If the user has previously stated a deliverable preference such as "不用输出原型，输出带产品结构的 PRD", treat that as the default standard for the rest of the workflow unless the user explicitly overrides it later.
+
 ## User-Facing Output Pattern
 
 When orchestrating, keep the message short and structured:
