@@ -1,341 +1,205 @@
-# Startup Workflow Skills for AI Agents
+# 0-1 Project Workflow
 
-一个面向 AI agent / AI 助手的产品立项工作流技能包，用来把一个模糊想法推进成清晰的 MVP 范围。
+0-1 Project Workflow is a staged product-initiation workflow for AI agents. It helps teams move from a rough idea to a reviewable MVP scope through a gated process instead of jumping straight into a PRD, prototype, or feature list.
 
-This repository is a product initiation workflow for AI agents and AI assistants. It helps turn a rough idea into a clear MVP scope through a staged, reviewable process.
+This repository is not Codex-only. The workflow logic is written as portable Markdown-based skills, while the repository also includes a Codex-friendly packaging layout and a repo-local plugin under `plugins/startup-workflow/`.
 
-## What This Is / 这是什么
+## 中文说明
 
-这不是一个只给 Codex 用的仓库。
+`0-1 Project Workflow` 是一个面向 AI agent / AI 助手的产品立项工作流仓库。它的目标不是让 AI 直接替你拍结论，而是把一个模糊产品想法拆成一组可评审、可回滚、可暂停的阶段化判断，最终收敛到清晰的 MVP 范围。
 
-它当前以 Codex 的技能目录结构发布，但核心内容是可迁移的 Markdown workflow skills。只要你的 AI 工具支持以下任意一种能力，就可以使用或适配这套 workflow：
+这个仓库适合以下场景：
 
-- reusable prompts
-- local instruction files
-- skills / plugins / extensions
-- agent memory or task-specific playbooks
+- 你有一个 0-1 产品想法，但还不够清晰
+- 你想让 AI 参与产品立项，而不是直接生成一份空泛 PRD
+- 你需要一套能暂停、回滚、复用的产品判断流程
+- 你想在团队里复用一套一致的 AI-assisted product workflow
 
-This is not Codex-only.
+### 仓库定位
 
-The repository is currently packaged in a Codex-friendly skill layout, but the core content is portable Markdown-based workflow skills. You can use or adapt it in any AI tool that supports:
+这个仓库有两层内容：
 
-- reusable prompts
-- local instruction files
-- skills, plugins, or extensions
-- agent memory or task-specific playbooks
+- `workflow logic`
+  阶段定义、阶段契约、状态推进规则，以及每个阶段该如何判断
+- `packaging format`
+  这些 workflow 如何被 Codex 或其他 AI 工具加载和触发
 
-## How It Works / 工作流如何运作
+因此，它不是“只能给 Codex 用的仓库”。
 
-这套 workflow 的目标不是让 AI 直接替你“拍脑袋给结论”，而是把产品立项拆成一组阶段化判断：
+你可以把它当成：
 
-1. 定义机会
-2. 设计用户研究
-3. 审查证据与洞察
-4. 判断 AI 是否适配体验
-5. 审查市场与战略逻辑
-6. 审查商业模式与关键风险
-7. 收敛到 MVP 范围
+- 一套直接可用的 Codex skills
+- 一个 repo-local Codex plugin
+- 一套可以迁移到 Cursor、Claude Code、Gemini CLI、OpenCode 或自定义 agent framework 的 Markdown workflow
 
-编排器 `startup-workflow-orchestrator` 负责控制节奏、维护状态、阻止自动跳阶段。
+### 角色与分工
 
-每个阶段结束后只能得到三种结果：
+这套 workflow 里主要有三类角色：
 
-- `go`
-- `revise`
-- `stop`
+- `Product Manager`
+  负责给出背景、补充信息、审查阶段输出，并在每个阶段结束时决定 `go`、`revise` 或 `stop`
+- `startup-workflow-orchestrator`
+  作为控制平面，负责读取状态、判断当前阶段、说明本阶段输入输出，并在每阶段结束后停下等待确认
+- `Stage Skills`
+  负责完成具体分析任务，每个阶段只做自己该做的判断，不越权跳到后续阶段
 
-The workflow is designed to prevent shallow AI output.
+### 工作流程
 
-Instead of jumping straight to a PRD or prototype, it breaks product initiation into gated stages:
-
-1. frame the opportunity
-2. plan user research
-3. review evidence and insights
-4. evaluate whether AI truly fits the experience
-5. review market and strategy
-6. review business model and key risks
-7. define MVP scope
-
-The `startup-workflow-orchestrator` skill manages flow control, workflow state, and stage gating.
-
-Each stage ends with exactly one decision:
-
-- `go`
-- `revise`
-- `stop`
-
-## Compatibility / 兼容方式
-
-这套仓库分成两层：
-
-- workflow logic：阶段定义、阶段契约、状态推进规则
-- packaging format：某个具体工具如何加载这些 skill
-
-当前仓库的 packaging format 偏向 Codex，但 workflow logic 本身可以用于其他工具。
-
-The repository has two layers:
-
-- workflow logic: stage definitions, stage contracts, and state transitions
-- packaging format: how a specific AI tool loads and runs the skills
-
-The current packaging is Codex-oriented, but the workflow logic is tool-agnostic.
-
-### Codex
-
-Codex 可以直接使用当前目录结构。
-
-Codex can use the current directory structure directly.
-
-This repository now supports two Codex-facing packaging modes:
-
-- direct skills under `skills/`
-- a repo-local plugin under `plugins/startup-workflow/`
-
-### Other AI Tools
-
-其他 AI 工具通常有三种接入方式：
-
-1. 作为本地 skills / plugins / extensions 导入
-2. 作为可复用 prompt files 保存
-3. 作为项目级 agent instructions 或 playbook 接入
-
-如果你的工具没有“skills”概念，也仍然可以使用：
-
-- 把各个 `SKILL.md` 作为阶段模板
-- 把 `references/` 中的规则作为附加上下文
-- 把 `startup-workflow-orchestrator` 作为总控提示词
-
-Most non-Codex tools can adopt this workflow in one of three ways:
-
-1. import the files as local skills, plugins, or extensions
-2. store them as reusable prompt files
-3. use them as project-level agent instructions or playbooks
-
-If your tool does not have a formal skill system, you can still use the repo by:
-
-- treating each `SKILL.md` as a stage prompt
-- using files in `references/` as supporting context
-- using `startup-workflow-orchestrator` as the control-plane prompt
-
-## Installation / 安装方式
-
-### Codex
-
-```bash
-git clone https://github.com/kelvinlrh-cloud/codex-startup-workflow.git
-mkdir -p ~/.codex/skills
-cp -R codex-startup-workflow/skills/* ~/.codex/skills/
-```
-
-### Codex Plugin
-
-如果你希望这套 workflow 以一个本地 plugin 的方式出现，而不是散落的 skill 目录，可以直接使用仓库内已经准备好的 plugin：
-
-```text
-plugins/startup-workflow/
-.agents/plugins/marketplace.json
-```
-
-这适合需要：
-
-- plugin manifest
-- marketplace entry
-- plugin-level icon, logo, and screenshots
-- 一个更像产品扩展的安装形态
-
-If you want the workflow to behave like a local Codex plugin instead of a loose skill pack, use the built-in plugin packaging in:
-
-```text
-plugins/startup-workflow/
-.agents/plugins/marketplace.json
-```
-
-This mode is useful when you want:
-
-- a plugin manifest
-- a marketplace entry
-- plugin-level branding assets
-- a more productized installation shape
-
-### Other AI Tools
-
-如果你使用的是 Claude Code、Cursor、Gemini CLI、OpenCode、Copilot CLI 或自定义 agent framework，这个仓库更适合按“内容迁移”的方式使用，而不是假设存在统一安装命令。
-
-推荐步骤：
-
-1. clone 这个仓库
-2. 选择你需要的 skill 目录
-3. 把 `SKILL.md` 和对应的 `references/` 一起迁移到你的工具
-4. 把编排器 skill 设为主入口
-5. 用你所在工具支持的 prompt / skill / extension 机制触发它
-
-For Claude Code, Cursor, Gemini CLI, OpenCode, Copilot CLI, or a custom agent framework, the recommended approach is content portability rather than assuming a single universal installer.
-
-Recommended steps:
-
-1. clone this repository
-2. select the skills you want
-3. copy each `SKILL.md` together with its related `references/`
-4. use the orchestrator as the entry point
-5. trigger it through your tool's prompt, skill, plugin, or extension mechanism
-
-## Quick Start / 快速开始
-
-### Chinese
-
-把 `startup-workflow-orchestrator` 交给你的 AI agent，然后发出类似请求：
-
-```text
-我想从一个新 idea 开始，启动产品立项 workflow：……
-```
-
-如果你已经跑过一部分，也可以说：
-
-```text
-继续当前 workflow
-```
-
-### English
-
-Give your AI agent the `startup-workflow-orchestrator` skill, then start with a prompt like:
-
-```text
-I want to start a product initiation workflow from a new idea: ...
-```
-
-If the workflow already exists, you can say:
-
-```text
-Continue the current workflow.
-```
-
-## Workflow Stages / 工作流阶段
+整个 workflow 分为 7 个阶段：
 
 1. `opportunity-framer`
+   把模糊想法收敛成一个可测试的机会定义，明确目标用户、问题、场景和边界。
 2. `user-research-planner`
+   设计用户研究方案，决定该访谈谁、怎么问、怎么记录、怎么判断结果。
 3. `evidence-and-insight-reviewer`
+   审查研究和观察结果，区分证据、推断和未验证假设。
 4. `ai-fit-and-experience-reviewer`
+   判断 AI 在这个产品体验里是否真的必要，避免为 AI 而 AI。
 5. `market-and-strategy-reviewer`
+   审查市场逻辑、竞争环境、why now 和战略成立条件。
 6. `business-and-risk-reviewer`
+   审查获客、留存、成本、商业模式和关键失败风险。
 7. `mvp-scope-planner`
+   把通过前面审查的方向收敛成第一版 MVP 范围、must-have、non-goals 和验证计划。
 
-其中：
+这套 workflow 的推进规则很明确：
 
-- `startup-workflow-orchestrator` 负责判断当前阶段、读写状态、控制推进
-- 其余 skill 负责具体阶段分析和输出
+- 每个阶段结束后只能得到 `go`、`revise` 或 `stop`
+- 编排器负责更新状态并强制停下
+- 不允许自动跳过阶段，也不允许直接从 idea 跳到 MVP
 
-In this system:
+### 产出物
 
-- `startup-workflow-orchestrator` handles stage selection, workflow state, and progression control
-- the remaining skills do the stage-specific analysis and output
+当这套 workflow 在某个项目里运行时，通常会把产出写到 `docs/product-workflow/` 下，主要包括：
 
-## What's Inside / 仓库包含什么
+- `00-workflow-status.md`
+  工作流状态文件，记录当前阶段、阶段状态、下一推荐阶段和阻塞问题
+- `01-...md` 到 `07-...md`
+  每个阶段各自的结构化 Markdown 输出
+- `research/`
+  用户研究阶段产生的筛选表、访谈提纲、笔记模板和结果模板
+- `summaries/`
+  每个阶段的 YAML 摘要，供后续阶段继续读取
+
+这些文件是 workflow 在用户项目里的运行产物，不是这个仓库本身必须预先提交的内容。
+
+### 如何使用
+
+最常见的使用方式如下：
+
+1. 安装这套 workflow 的 skills，或启用 `plugins/startup-workflow/` 下的本地 plugin
+2. 在你的 AI 工具里调用 `startup-workflow-orchestrator`
+3. 用一句话或几段话描述你要评估的产品想法
+4. 让 orchestrator 初始化或恢复 `docs/product-workflow/`
+5. 按阶段推进，并在每个阶段结束后人工决定 `go`、`revise` 或 `stop`
+6. 最终在 `07-mvp-scope-planner.md` 中得到第一版 MVP 范围
+
+推荐的启动方式示例：
+
+- “用 `startup-workflow-orchestrator` 帮我启动一个新的 0-1 产品 workflow，方向是 AI 面试陪练。”
+- “继续当前的 product workflow，并告诉我下一阶段应该做什么。”
+- “检查 `docs/product-workflow/` 的状态，判断是否可以进入 MVP scope 规划。”
+
+### 兼容与安装
+
+如果你使用的是 Codex，这个仓库提供两种接入方式：
+
+- 直接使用 `skills/` 下的 skill 目录
+- 使用 `plugins/startup-workflow/` 作为 repo-local plugin
+
+相关目录：
 
 ```text
 skills/
-  startup-workflow-orchestrator/
-  opportunity-framer/
-  user-research-planner/
-  evidence-and-insight-reviewer/
-  ai-fit-and-experience-reviewer/
-  market-and-strategy-reviewer/
-  business-and-risk-reviewer/
-  mvp-scope-planner/
-
-plugins/
-  startup-workflow/
-    .codex-plugin/plugin.json
-    skills/
-    assets/
-    legal/
-
-.agents/plugins/
-  marketplace.json
+plugins/startup-workflow/
+.agents/plugins/marketplace.json
 ```
 
-请不要只复制单个 `SKILL.md`。
+如果你使用的是其他 AI 工具，一般推荐按“内容迁移”的方式使用：
 
-很多 skill 还依赖：
+1. clone 这个仓库
+2. 选择你需要的 skill 目录
+3. 把 `SKILL.md` 和对应的 `references/`、`agents/` 一起迁移
+4. 把 `startup-workflow-orchestrator` 作为总控入口
+5. 用所在工具支持的 prompt / skill / extension 机制触发它
 
-- `references/`
-- `agents/`
+不要只复制单个 `SKILL.md`，因为很多阶段还依赖 `references/` 和 `agents/`。
 
-Do not copy only the top-level `SKILL.md`.
+### 与 Track Workflow 的区别
 
-Many skills also depend on:
+`0-1 Project Workflow` 关注的是“从一个具体产品机会出发，逐步验证并收敛到 MVP 范围”。
 
-- `references/`
-- `agents/`
+它和 `Track Workflow` 的区别是：
 
-## Output Artifacts / 会产出什么
+- `0-1 Project Workflow`
+  从具体 idea 或机会出发，输出写入 `docs/product-workflow/`
+- `Track Workflow`
+  从赛道进入问题出发，先判断市场结构、切口和进入策略，输出写入 `docs/track-workflow/`
 
-当某个 agent 按照这套 workflow 在项目中执行时，通常会在项目内生成：
+如果你当前面对的问题是“这个产品机会到底值不值得做、AI 是否适配、第一版 MVP 应该是什么”，用 `0-1 Project Workflow`。
+如果你当前面对的问题是“这个市场值不值得进、从哪一刀切进去”，应该用 `Track Workflow`。
 
-```text
-docs/product-workflow/
-  00-workflow-status.md
-  01-opportunity-framer.md
-  02-user-research-planner.md
-  03-evidence-and-insight-reviewer.md
-  04-ai-fit-and-experience-reviewer.md
-  05-market-and-strategy-reviewer.md
-  06-business-and-risk-reviewer.md
-  07-mvp-scope-planner.md
-  research/
-  summaries/
-```
+## What It Includes
 
-这些是 workflow 运行产物，不是仓库本身必须提前提交的内容。
+- `startup-workflow-orchestrator` as the control-plane skill
+- seven stage skills from opportunity framing to MVP scope definition
+- direct skill packaging under `skills/`
+- a repo-local Codex plugin under `plugins/startup-workflow/`
+- plugin metadata, branding assets, and marketplace registration for local plugin use
 
-When an agent runs this workflow inside a project, it will typically generate:
+## Included Skills
 
-```text
-docs/product-workflow/
-  00-workflow-status.md
-  01-opportunity-framer.md
-  02-user-research-planner.md
-  03-evidence-and-insight-reviewer.md
-  04-ai-fit-and-experience-reviewer.md
-  05-market-and-strategy-reviewer.md
-  06-business-and-risk-reviewer.md
-  07-mvp-scope-planner.md
-  research/
-  summaries/
-```
+- `startup-workflow-orchestrator`
+- `opportunity-framer`
+- `user-research-planner`
+- `evidence-and-insight-reviewer`
+- `ai-fit-and-experience-reviewer`
+- `market-and-strategy-reviewer`
+- `business-and-risk-reviewer`
+- `mvp-scope-planner`
 
-These are workflow outputs inside the user's project, not files that must exist in this repository ahead of time.
+## Workflow Stages
 
-## When To Use It / 适合什么场景
+1. Opportunity framing
+2. User research planning
+3. Evidence and insight review
+4. AI fit and experience review
+5. Market and strategy review
+6. Business and risk review
+7. MVP scope planning
 
-- 你有一个还不够清晰的新产品想法
-- 你想让 AI 参与产品立项，但不想要空泛结论
-- 你需要一套可回滚、可暂停、可复用的产品判断流程
-- 你想在团队内复用同一套 AI-assisted workflow
+## Workspace Output
 
-- You have an early-stage product idea that is still fuzzy
-- You want AI assistance without shallow hand-wavy output
-- You need a workflow that is reviewable, pausable, and reversible
-- You want a reusable AI-assisted initiation process across a team
+When this workflow runs inside a project, it typically writes artifacts under `docs/product-workflow/`, including:
 
-## Design Principles / 设计原则
+- `00-workflow-status.md`
+- one Markdown file per stage from `01-...md` to `07-...md`
+- research artifacts under `docs/product-workflow/research/`
+- YAML summaries under `docs/product-workflow/summaries/`
+
+## Install Or Reuse
+
+For Codex, you can either:
+
+1. use the direct skills under `skills/`
+2. use the repo-local plugin under `plugins/startup-workflow/`
+
+For other AI tools, the recommended pattern is content portability:
+
+1. clone the repository
+2. copy the stage `SKILL.md` files together with related `references/` and `agents/`
+3. use `startup-workflow-orchestrator` as the entry point
+4. trigger the workflow through your tool's prompt, skill, plugin, or extension mechanism
+
+## Design Principles
 
 - gated progression over auto-advance
 - evidence over unsupported claims
 - structured review over one-shot generation
 - explicit rollback over silent drift
-- PRD-quality output over flashy prototype defaults
+- reviewable MVP scope over flashy output
 
-- 先过关再推进，不自动跳阶段
-- 证据优先，不接受无依据判断
-- 结构化评审优先，不鼓励一把梭生成
-- 可以明确回滚，不允许悄悄漂移
-- 在进入定义和交付阶段时，默认优先输出结构化 PRD，而不是自动给原型
-
-## Contributing / 贡献
-
-Skills live directly in this repository.
-
-如果你要贡献新的 stage、reference 或 workflow rule，请先看 [CONTRIBUTING.md](./CONTRIBUTING.md)。
+## Contributing
 
 If you want to contribute new stages, references, or workflow rules, read [CONTRIBUTING.md](./CONTRIBUTING.md) first.
 
