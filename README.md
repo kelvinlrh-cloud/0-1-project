@@ -1,31 +1,180 @@
-# Codex Startup Workflow Skills
+# Startup Workflow Skills for AI Agents
 
-一套用于 Codex 的产品立项工作流技能包，帮助你把一个模糊想法逐步推进到可执行的 MVP 功能范围。
+一个面向 AI agent / AI 助手的产品立项工作流技能包，用来把一个模糊想法推进成清晰的 MVP 范围。
 
-## 这个技能包是干什么的
+This repository is a product initiation workflow for AI agents and AI assistants. It helps turn a rough idea into a clear MVP scope through a staged, reviewable process.
 
-这套技能包的目标，不是直接替代产品经理做判断，而是提供一套结构化、可暂停、可回滚的工作流，让你用统一的方法完成以下过程：
+## What This Is / 这是什么
 
-1. 把一个初始想法定义清楚
-2. 设计用户研究和验证方式
-3. 判断证据是否足够支持这个机会
-4. 判断 AI 是否真的适合放进这个产品体验
-5. 评估市场和战略层面是否值得做
-6. 评估商业模式与关键风险是否成立
-7. 收敛出一版清晰、克制的 MVP 功能范围
+这不是一个只给 Codex 用的仓库。
 
-它适合以下场景：
+它当前以 Codex 的技能目录结构发布，但核心内容是可迁移的 Markdown workflow skills。只要你的 AI 工具支持以下任意一种能力，就可以使用或适配这套 workflow：
 
-- 你有一个新产品想法，但还比较模糊
-- 你希望用阶段化方式推进产品立项
-- 你希望每一阶段都有明确输入、输出和决策
-- 你希望在团队内复用同一套产品判断流程
+- reusable prompts
+- local instruction files
+- skills / plugins / extensions
+- agent memory or task-specific playbooks
 
-## 这套工作流怎么运作
+This is not Codex-only.
 
-整个 workflow 由 1 个编排器技能和 7 个阶段技能组成。
+The repository is currently packaged in a Codex-friendly skill layout, but the core content is portable Markdown-based workflow skills. You can use or adapt it in any AI tool that supports:
 
-阶段顺序如下：
+- reusable prompts
+- local instruction files
+- skills, plugins, or extensions
+- agent memory or task-specific playbooks
+
+## How It Works / 工作流如何运作
+
+这套 workflow 的目标不是让 AI 直接替你“拍脑袋给结论”，而是把产品立项拆成一组阶段化判断：
+
+1. 定义机会
+2. 设计用户研究
+3. 审查证据与洞察
+4. 判断 AI 是否适配体验
+5. 审查市场与战略逻辑
+6. 审查商业模式与关键风险
+7. 收敛到 MVP 范围
+
+编排器 `startup-workflow-orchestrator` 负责控制节奏、维护状态、阻止自动跳阶段。
+
+每个阶段结束后只能得到三种结果：
+
+- `go`
+- `revise`
+- `stop`
+
+The workflow is designed to prevent shallow AI output.
+
+Instead of jumping straight to a PRD or prototype, it breaks product initiation into gated stages:
+
+1. frame the opportunity
+2. plan user research
+3. review evidence and insights
+4. evaluate whether AI truly fits the experience
+5. review market and strategy
+6. review business model and key risks
+7. define MVP scope
+
+The `startup-workflow-orchestrator` skill manages flow control, workflow state, and stage gating.
+
+Each stage ends with exactly one decision:
+
+- `go`
+- `revise`
+- `stop`
+
+## Compatibility / 兼容方式
+
+这套仓库分成两层：
+
+- workflow logic：阶段定义、阶段契约、状态推进规则
+- packaging format：某个具体工具如何加载这些 skill
+
+当前仓库的 packaging format 偏向 Codex，但 workflow logic 本身可以用于其他工具。
+
+The repository has two layers:
+
+- workflow logic: stage definitions, stage contracts, and state transitions
+- packaging format: how a specific AI tool loads and runs the skills
+
+The current packaging is Codex-oriented, but the workflow logic is tool-agnostic.
+
+### Codex
+
+Codex 可以直接使用当前目录结构。
+
+Codex can use the current directory structure directly.
+
+### Other AI Tools
+
+其他 AI 工具通常有三种接入方式：
+
+1. 作为本地 skills / plugins / extensions 导入
+2. 作为可复用 prompt files 保存
+3. 作为项目级 agent instructions 或 playbook 接入
+
+如果你的工具没有“skills”概念，也仍然可以使用：
+
+- 把各个 `SKILL.md` 作为阶段模板
+- 把 `references/` 中的规则作为附加上下文
+- 把 `startup-workflow-orchestrator` 作为总控提示词
+
+Most non-Codex tools can adopt this workflow in one of three ways:
+
+1. import the files as local skills, plugins, or extensions
+2. store them as reusable prompt files
+3. use them as project-level agent instructions or playbooks
+
+If your tool does not have a formal skill system, you can still use the repo by:
+
+- treating each `SKILL.md` as a stage prompt
+- using files in `references/` as supporting context
+- using `startup-workflow-orchestrator` as the control-plane prompt
+
+## Installation / 安装方式
+
+### Codex
+
+```bash
+git clone https://github.com/kelvinlrh-cloud/codex-startup-workflow.git
+mkdir -p ~/.codex/skills
+cp -R codex-startup-workflow/skills/* ~/.codex/skills/
+```
+
+### Other AI Tools
+
+如果你使用的是 Claude Code、Cursor、Gemini CLI、OpenCode、Copilot CLI 或自定义 agent framework，这个仓库更适合按“内容迁移”的方式使用，而不是假设存在统一安装命令。
+
+推荐步骤：
+
+1. clone 这个仓库
+2. 选择你需要的 skill 目录
+3. 把 `SKILL.md` 和对应的 `references/` 一起迁移到你的工具
+4. 把编排器 skill 设为主入口
+5. 用你所在工具支持的 prompt / skill / extension 机制触发它
+
+For Claude Code, Cursor, Gemini CLI, OpenCode, Copilot CLI, or a custom agent framework, the recommended approach is content portability rather than assuming a single universal installer.
+
+Recommended steps:
+
+1. clone this repository
+2. select the skills you want
+3. copy each `SKILL.md` together with its related `references/`
+4. use the orchestrator as the entry point
+5. trigger it through your tool's prompt, skill, plugin, or extension mechanism
+
+## Quick Start / 快速开始
+
+### Chinese
+
+把 `startup-workflow-orchestrator` 交给你的 AI agent，然后发出类似请求：
+
+```text
+我想从一个新 idea 开始，启动产品立项 workflow：……
+```
+
+如果你已经跑过一部分，也可以说：
+
+```text
+继续当前 workflow
+```
+
+### English
+
+Give your AI agent the `startup-workflow-orchestrator` skill, then start with a prompt like:
+
+```text
+I want to start a product initiation workflow from a new idea: ...
+```
+
+If the workflow already exists, you can say:
+
+```text
+Continue the current workflow.
+```
+
+## Workflow Stages / 工作流阶段
 
 1. `opportunity-framer`
 2. `user-research-planner`
@@ -37,136 +186,45 @@
 
 其中：
 
-- `startup-workflow-orchestrator` 负责判断当前处于哪个阶段、应该读写哪些文件、阶段结束后如何更新状态
-- 其余 7 个 skills 负责各自阶段的分析和产出
+- `startup-workflow-orchestrator` 负责判断当前阶段、读写状态、控制推进
+- 其余 skill 负责具体阶段分析和输出
 
-每个阶段结束后，只会得到三种决策结果：
+In this system:
 
-- `go`：进入下一阶段
-- `revise`：当前阶段或更早阶段需要重做
-- `stop`：结束这一轮 workflow
+- `startup-workflow-orchestrator` handles stage selection, workflow state, and progression control
+- the remaining skills do the stage-specific analysis and output
 
-编排器不会自动跑完整套流程。每完成一阶段，它都会停下来，等待你确认是否继续。
-
-## 包含的技能
-
-请保持以下目录完整，不要只复制单个 `SKILL.md` 文件：
-
-- `startup-workflow-orchestrator`
-- `opportunity-framer`
-- `user-research-planner`
-- `evidence-and-insight-reviewer`
-- `ai-fit-and-experience-reviewer`
-- `market-and-strategy-reviewer`
-- `business-and-risk-reviewer`
-- `mvp-scope-planner`
-
-这些 skill 目录中的 `references/`、`agents/` 等配套文件也是工作流的一部分。
-
-## 推荐目录结构
-
-建议将仓库组织成如下结构：
+## What's Inside / 仓库包含什么
 
 ```text
-codex-startup-workflow/
-  README.md
-  LICENSE
-  skills/
-    startup-workflow-orchestrator/
-    opportunity-framer/
-    user-research-planner/
-    evidence-and-insight-reviewer/
-    ai-fit-and-experience-reviewer/
-    market-and-strategy-reviewer/
-    business-and-risk-reviewer/
-    mvp-scope-planner/
+skills/
+  startup-workflow-orchestrator/
+  opportunity-framer/
+  user-research-planner/
+  evidence-and-insight-reviewer/
+  ai-fit-and-experience-reviewer/
+  market-and-strategy-reviewer/
+  business-and-risk-reviewer/
+  mvp-scope-planner/
 ```
 
-## 安装方法
+请不要只复制单个 `SKILL.md`。
 
-如果你是通过 GitHub 获取这个仓库，安装步骤如下：
+很多 skill 还依赖：
 
-```bash
-git clone <your-repo-url>
-mkdir -p ~/.codex/skills
-cp -R codex-startup-workflow/skills/* ~/.codex/skills/
-```
+- `references/`
+- `agents/`
 
-如果你是通过压缩包获取，也可以直接将 `skills/` 目录下的内容复制到：
+Do not copy only the top-level `SKILL.md`.
 
-```bash
-~/.codex/skills/
-```
+Many skills also depend on:
 
-## 快速开始
+- `references/`
+- `agents/`
 
-安装完成后，进入你自己的项目目录，直接对 Codex 发送类似下面的指令：
+## Output Artifacts / 会产出什么
 
-```text
-[$startup-workflow-orchestrator](~/.codex/skills/startup-workflow-orchestrator/SKILL.md)
-我想从一个新 idea 开始，启动产品立项 workflow：……
-```
-
-如果你已经在项目中跑过这套流程，也可以直接说：
-
-```text
-继续当前 workflow
-```
-
-或者：
-
-```text
-看下当前 workflow 的进度
-```
-
-## 使用方法
-
-### 1. 启动一个新 workflow
-
-进入你自己的项目目录后，对 Codex 说类似这样的话：
-
-```text
-[$startup-workflow-orchestrator](~/.codex/skills/startup-workflow-orchestrator/SKILL.md)
-我想为一个新的产品想法启动 workflow：……
-```
-
-如果你只是给一个简短 idea，编排器会默认从这个想法本身开始，不会自动读取你项目里的其他资料。
-
-### 2. 继续已有 workflow
-
-如果你已经跑过一部分，可以说：
-
-```text
-继续当前 workflow
-```
-
-或者：
-
-```text
-看下当前 workflow 到哪一步了
-```
-
-这时编排器会读取项目内的：
-
-```text
-docs/product-workflow/00-workflow-status.md
-```
-
-并判断当前阶段、下一推荐阶段、是否需要回滚。
-
-### 3. 在每一阶段完成后做决策
-
-每个阶段结束后，你需要明确给出下一步判断：
-
-- `go`
-- `revise`
-- `stop`
-
-这一步是工作流的关键。它确保流程不是一股脑往前跑，而是按你的判断推进。
-
-## 运行后会生成什么
-
-当编排器在你的项目中启动 workflow 后，通常会在项目里创建：
+当某个 agent 按照这套 workflow 在项目中执行时，通常会在项目内生成：
 
 ```text
 docs/product-workflow/
@@ -182,44 +240,60 @@ docs/product-workflow/
   summaries/
 ```
 
-这些文件属于使用者自己的项目产物，不属于本技能包本身。
+这些是 workflow 运行产物，不是仓库本身必须提前提交的内容。
 
-## 发布到 GitHub
+When an agent runs this workflow inside a project, it will typically generate:
 
-如果你想像普通开源项目一样把这套技能包发布到 GitHub，建议按以下步骤操作：
-
-```bash
-cd codex-startup-workflow
-git init
-git add README.md LICENSE .gitignore skills
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin <your-repo-url>
-git push -u origin main
+```text
+docs/product-workflow/
+  00-workflow-status.md
+  01-opportunity-framer.md
+  02-user-research-planner.md
+  03-evidence-and-insight-reviewer.md
+  04-ai-fit-and-experience-reviewer.md
+  05-market-and-strategy-reviewer.md
+  06-business-and-risk-reviewer.md
+  07-mvp-scope-planner.md
+  research/
+  summaries/
 ```
 
-建议仓库名保持直观，例如：
+These are workflow outputs inside the user's project, not files that must exist in this repository ahead of time.
 
-- `codex-startup-workflow`
-- `codex-product-initiation-workflow`
-- `codex-startup-skills`
+## When To Use It / 适合什么场景
 
-## 使用建议
+- 你有一个还不够清晰的新产品想法
+- 你想让 AI 参与产品立项，但不想要空泛结论
+- 你需要一套可回滚、可暂停、可复用的产品判断流程
+- 你想在团队内复用同一套 AI-assisted workflow
 
-- 用它来推进“一个具体产品机会”，不要同时混入多个无关 idea
-- 不要跳过中间阶段，否则后续判断会失去依据
-- 如果阶段结论是 `revise`，就按建议回滚，不要把 `revise` 当成 `go`
-- 如果只是想单独做某一类分析，直接调用对应阶段 skill，不一定非要走完整个 orchestrator
+- You have an early-stage product idea that is still fuzzy
+- You want AI assistance without shallow hand-wavy output
+- You need a workflow that is reviewable, pausable, and reversible
+- You want a reusable AI-assisted initiation process across a team
 
-## 适合谁
+## Design Principles / 设计原则
 
-这套技能包更适合以下角色：
+- gated progression over auto-advance
+- evidence over unsupported claims
+- structured review over one-shot generation
+- explicit rollback over silent drift
+- PRD-quality output over flashy prototype defaults
 
-- 独立产品探索者
-- AI 产品经理
-- 创业团队中的 0 到 1 负责人
-- 需要把产品判断流程标准化的小团队
+- 先过关再推进，不自动跳阶段
+- 证据优先，不接受无依据判断
+- 结构化评审优先，不鼓励一把梭生成
+- 可以明确回滚，不允许悄悄漂移
+- 在进入定义和交付阶段时，默认优先输出结构化 PRD，而不是自动给原型
+
+## Contributing / 贡献
+
+Skills live directly in this repository.
+
+如果你要贡献新的 stage、reference 或 workflow rule，请先看 [CONTRIBUTING.md](./CONTRIBUTING.md)。
+
+If you want to contribute new stages, references, or workflow rules, read [CONTRIBUTING.md](./CONTRIBUTING.md) first.
 
 ## License
 
-建议为该仓库补充一个明确的 `LICENSE` 文件，例如 `MIT`。否则别人虽然能看到仓库内容，但复用边界不清晰。
+MIT License. See [LICENSE](./LICENSE).
